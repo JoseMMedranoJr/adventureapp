@@ -1,8 +1,7 @@
-const API_URL = 'http://127.0.0.1:8000/api'
+const API_URL = import.meta.env.VITE_API_URL
 
-// =====================
-// TOKEN HELPERS
-// =====================
+// Tokn help
+
 export function getToken() {
   return localStorage.getItem('token')
 }
@@ -41,9 +40,9 @@ export function removeTokens() {
   removeRefreshToken()
 }
 
-// =====================
-// REFRESH TOKEN
-// =====================
+
+// refresh tokn
+
 async function refreshAccessToken() {
   const refresh = getRefreshToken()
 
@@ -81,23 +80,23 @@ async function refreshAccessToken() {
   return null
 }
 
-// =====================
-// AUTH FETCH
-// =====================
+
+// auth fethc
+
 async function authFetch(url, options = {}) {
   let token = getToken()
 
-  const firstHeaders = {
+  const headers = {
     ...(options.headers || {}),
   }
 
   if (token) {
-    firstHeaders.Authorization = `Bearer ${token}`
+    headers.Authorization = `Bearer ${token}`
   }
 
   let response = await fetch(url, {
     ...options,
-    headers: firstHeaders,
+    headers,
   })
 
   if (response.status === 401) {
@@ -107,23 +106,21 @@ async function authFetch(url, options = {}) {
       throw new Error('Session expired')
     }
 
-    const retryHeaders = {
-      ...(options.headers || {}),
-      Authorization: `Bearer ${newToken}`,
-    }
-
     response = await fetch(url, {
       ...options,
-      headers: retryHeaders,
+      headers: {
+        ...(options.headers || {}),
+        Authorization: `Bearer ${newToken}`,
+      },
     })
   }
 
   return response
 }
 
-// =====================
+
 // AUTH
-// =====================
+
 export async function signup(userData) {
   const response = await fetch(`${API_URL}/users/signup/`, {
     method: 'POST',
@@ -162,9 +159,9 @@ export function logout() {
   removeTokens()
 }
 
-// =====================
-// SEARCH
-// =====================
+
+// search
+
 export async function searchAdventures(city) {
   const response = await authFetch(
     `${API_URL}/search/?city=${encodeURIComponent(city)}`
@@ -177,9 +174,9 @@ export async function searchAdventures(city) {
   return await response.json()
 }
 
-// =====================
-// SAVED ADVENTURES (CRUD)
-// =====================
+
+// crud - saved a
+
 export async function saveAdventure(data) {
   const response = await authFetch(`${API_URL}/saved-adventures/`, {
     method: 'POST',
