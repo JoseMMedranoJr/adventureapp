@@ -1,2 +1,6 @@
 venv
 __pycache__pi
+# env files
+.env
+backend/.env
+frontend/.env
