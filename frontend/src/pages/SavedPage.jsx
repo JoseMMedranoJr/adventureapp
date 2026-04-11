@@ -57,14 +57,12 @@ function SavedPage() {
 
           return (
             <article className="adventure-card" key={item.id}>
-              {item.adventure && item.adventure.image_url ? (
+              {adventure.image_url ? (
                 <img
                   className="card-image"
-                  src={item.adventure.image_url}
-                  alt={item.adventure.title || 'Adventure'}
+                  src={adventure.image_url}
+                  alt={adventure.title || 'Adventure'}
                 />
-              ) : item.adventure && item.adventure.title ? (
-                <div className="card-top"></div>
               ) : (
                 <div className="card-top"></div>
               )}
@@ -91,9 +89,24 @@ function SavedPage() {
 
                 <p className="card-city">{adventure.city || ''}</p>
 
-                <p className="card-description">
-                  {item.notes || adventure.description || 'No notes yet.'}
-                </p>
+                {/* ORIGINAL DESCRIPTION (always shows) */}
+                {adventure.description && (
+                  <p className="card-description">
+                    {adventure.description}
+                  </p>
+                )}
+
+                {/* USER NOTES (separate + clearly labeled) */}
+                {item.notes && (
+                  <div className="user-notes-box">
+                    <p className="user-notes-label">Your Notes</p>
+                    <p className="user-notes-text">{item.notes}</p>
+                  </div>
+                )}
+
+                {!adventure.description && !item.notes && (
+                  <p className="card-description">No details available.</p>
+                )}
 
                 <div className="card-actions">
                   {adventure.website_url && (

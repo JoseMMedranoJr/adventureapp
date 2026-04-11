@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { searchAdventures, saveAdventure } from '../services/api'
 
 function HomePage() {
@@ -32,6 +32,31 @@ function HomePage() {
     return data
   }
 
+  useEffect(() => {
+    const savedCity = localStorage.getItem('lastCity')
+    const savedResults = localStorage.getItem('lastResults')
+    const savedFilter = localStorage.getItem('lastFilter')
+    const savedViewMode = localStorage.getItem('lastViewMode')
+
+    if (savedCity) {
+      setCity(savedCity)
+    }
+
+    if (savedViewMode) {
+      setViewMode(savedViewMode)
+    }
+
+    if (savedResults) {
+      const parsedResults = JSON.parse(savedResults)
+      const filterToUse = savedFilter || 'All'
+
+      setResults(parsedResults)
+      setActiveFilter(filterToUse)
+      setFilteredResults(applyFilter(parsedResults, filterToUse))
+      setMessage(`Found ${parsedResults.length} adventures`)
+    }
+  }, [])
+
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
@@ -41,10 +66,16 @@ function HomePage() {
       const data = await searchAdventures(city)
 
       if (Array.isArray(data)) {
-        setResults(data)
         const newFiltered = applyFilter(data, activeFilter)
+
+        setResults(data)
         setFilteredResults(newFiltered)
         setMessage(`Found ${data.length} adventures`)
+
+        localStorage.setItem('lastCity', city)
+        localStorage.setItem('lastResults', JSON.stringify(data))
+        localStorage.setItem('lastFilter', activeFilter)
+        localStorage.setItem('lastViewMode', viewMode)
       } else {
         setResults([])
         setFilteredResults([])
@@ -61,8 +92,17 @@ function HomePage() {
   }
 
   function handleFilterChange(filterName) {
+    const newFiltered = applyFilter(results, filterName)
+
     setActiveFilter(filterName)
-    setFilteredResults(applyFilter(results, filterName))
+    setFilteredResults(newFiltered)
+
+    localStorage.setItem('lastFilter', filterName)
+  }
+
+  function handleViewModeChange(mode) {
+    setViewMode(mode)
+    localStorage.setItem('lastViewMode', mode)
   }
 
   async function handleSave(item) {
@@ -86,9 +126,12 @@ function HomePage() {
       <section className="hero-section">
         <div className="hero-left">
           <p className="eyebrow">Explore your city</p>
-          <h2 className="hero-heading">Discover local adventures, parks, trails, concerts, and events.</h2>
+          <h2 className="hero-heading">
+            Discover local adventures, parks, trails, concerts, and events.
+          </h2>
           <p className="hero-text">
-            Search by city, browse real places, and save the ones you want to try next.
+            Search by city, browse real places, and save the ones you want to
+            try next.
           </p>
 
           <form className="search-form" onSubmit={handleSubmit}>
@@ -98,7 +141,9 @@ function HomePage() {
               onChange={(event) => setCity(event.target.value)}
               placeholder="Enter a city"
             />
-            <button className="button button-primary" type="submit">Search</button>
+            <button className="button button-primary" type="submit">
+              Search
+            </button>
           </form>
 
           {message && <p className="status-message">{message}</p>}
@@ -126,25 +171,41 @@ function HomePage() {
         <div className="toolbar-row">
           <div className="filter-buttons">
             <button
-              className={activeFilter === 'All' ? 'button button-primary' : 'button button-light'}
+              className={
+                activeFilter === 'All'
+                  ? 'button button-primary'
+                  : 'button button-light'
+              }
               onClick={() => handleFilterChange('All')}
             >
               All
             </button>
             <button
-              className={activeFilter === 'Parks' ? 'button button-primary' : 'button button-light'}
+              className={
+                activeFilter === 'Parks'
+                  ? 'button button-primary'
+                  : 'button button-light'
+              }
               onClick={() => handleFilterChange('Parks')}
             >
               Parks
             </button>
             <button
-              className={activeFilter === 'Trails' ? 'button button-primary' : 'button button-light'}
+              className={
+                activeFilter === 'Trails'
+                  ? 'button button-primary'
+                  : 'button button-light'
+              }
               onClick={() => handleFilterChange('Trails')}
             >
               Trails
             </button>
             <button
-              className={activeFilter === 'Events' ? 'button button-primary' : 'button button-light'}
+              className={
+                activeFilter === 'Events'
+                  ? 'button button-primary'
+                  : 'button button-light'
+              }
               onClick={() => handleFilterChange('Events')}
             >
               Events
@@ -153,14 +214,22 @@ function HomePage() {
 
           <div className="view-buttons">
             <button
-              className={viewMode === 'Grid' ? 'button button-primary' : 'button button-light'}
-              onClick={() => setViewMode('Grid')}
+              className={
+                viewMode === 'Grid'
+                  ? 'button button-primary'
+                  : 'button button-light'
+              }
+              onClick={() => handleViewModeChange('Grid')}
             >
               Grid
             </button>
             <button
-              className={viewMode === 'Map' ? 'button button-primary' : 'button button-light'}
-              onClick={() => setViewMode('Map')}
+              className={
+                viewMode === 'Map'
+                  ? 'button button-primary'
+                  : 'button button-light'
+              }
+              onClick={() => handleViewModeChange('Map')}
             >
               Map
             </button>
@@ -206,7 +275,10 @@ function HomePage() {
                       Learn More
                     </a>
 
-                    <button className="button button-primary" onClick={() => handleSave(item)}>
+                    <button
+                      className="button button-primary"
+                      onClick={() => handleSave(item)}
+                    >
                       Save Adventure
                     </button>
                   </div>
@@ -220,8 +292,8 @@ function HomePage() {
           <div className="map-placeholder">
             <h3>Map View</h3>
             <p>
-              Map view is turned on. A simple next step would be showing saved Google or Geoapify
-              map links for each result.
+              Map view is turned on. A simple next step would be showing saved
+              Google or Geoapify map links for each result.
             </p>
 
             <div className="results-grid">
