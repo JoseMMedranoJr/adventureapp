@@ -19,8 +19,8 @@ fi
 echo "Building and starting Docker containers..."
 docker compose up --build -d
 
-echo "Waiting for database to start..."
-sleep 8
+echo "Waiting for database to be ready..."
+sleep 15
 
 echo "Running migrations..."
 docker compose exec backend python manage.py migrate
