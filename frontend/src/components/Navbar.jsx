@@ -18,7 +18,7 @@ function Navbar() {
         </div>
 
       <nav className="header-actions">
-        <Link to="/" className="button button-primary">Home</Link>
+        <Link to="/home" className="button button-primary">Home</Link>
 
         {token && (
           <Link to="/saved" className="button button-primary">Saved</Link>

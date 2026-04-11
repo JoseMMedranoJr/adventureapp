@@ -22,12 +22,17 @@ function LoginPage() {
     event.preventDefault()
     setError('')
 
-    const data = await login(formData)
+    try {
+      const data = await login(formData)
 
-    if (data.access) {
-      setToken(data.access)
-      navigate('/')
-    } else {
+      if (data && data.access) {
+        setToken(data.access)
+        navigate('/home')   // ✅ CHANGED HERE
+      } else {
+        setError('Login failed')
+      }
+    } catch (err) {
+      console.log(err)
       setError('Login failed')
     }
   }
@@ -54,7 +59,9 @@ function LoginPage() {
             value={formData.password}
             onChange={handleChange}
           />
-          <button className="button button-primary" type="submit">Login</button>
+          <button className="button button-primary" type="submit">
+            Login
+          </button>
         </form>
 
         {error && <p className="status-error">{error}</p>}

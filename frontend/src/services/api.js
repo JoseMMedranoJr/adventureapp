@@ -215,7 +215,7 @@ export async function getSavedAdventure(id) {
 
 export async function updateSavedAdventure(id, data) {
   const response = await authFetch(`${API_URL}/saved-adventures/${id}/`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
     },
