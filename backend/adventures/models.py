@@ -9,7 +9,7 @@ class Adventure(models.Model):
     category = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
     google_place_id = models.CharField(max_length=255, blank=True)
-    image_url = models.URLField(blank=True)
+    image_url = models.URLField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
